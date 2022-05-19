@@ -1,8 +1,83 @@
-resource "random_pet" "rg-name" {
-  prefix = var.resource_group_name_prefix
+resource "azurerm_virtual_network" "vnet" {
+  name                = var.resource_virtual_network
+  address_space       = ["10.0.0.0/16"]
+  location            = var.resource_group_location
+  resource_group_name = var.resource_group
+}
+resource "azurerm_subnet" "vnet" {
+  name                 = var.resource_subnet
+  resource_group_name  = var.resource_group
+  virtual_network_name = var.resource_virtual_network
+  address_prefixes     = ["10.0.2.0/24"]
 }
 
-resource "azurerm_resource_group" "rg" {
-  name     = random_pet.rg-name.id
-  location = var.resource_group_location
+resource "azurerm_public_ip" "vm-public" {
+  name                = var.resource_public_ip
+  resource_group_name = var.resource_group
+  location            = var.resource_group_location
+  allocation_method   = "Dynamic"
+}
+
+resource "azurerm_network_interface" "vm-public" {
+  name                = var.resource_network_interface
+  location            = var.resource_group_location
+  resource_group_name = var.resource_group
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.vnet.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.vm-public.id
+  }
+}
+
+resource "azurerm_network_security_group" "nsg" {
+  name                = var.resource_nsg_ssh
+  location            = var.resource_group_location
+  resource_group_name = var.resource_group
+
+  security_rule {
+    name                       = "sg-allow-ssh"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+}
+
+resource "azurerm_network_interface_security_group_association" "association" {
+  network_interface_id      = azurerm_network_interface.vm-public.id
+  network_security_group_id = azurerm_network_security_group.nsg.id
+}
+
+resource "azurerm_linux_virtual_machine" "vm-public" {
+  name                = var.resource_linux_virtual_machine_public
+  resource_group_name = var.resource_group
+  location            = var.resource_group_location
+  size                = "Standard_B1ls"
+  admin_username      = "adminuser"
+  network_interface_ids = [
+    azurerm_network_interface.vm-public.id,
+  ]
+
+  admin_ssh_key {
+    username   = "adminuser"
+    public_key = file("~/.ssh/id_rsa.pub")
+  }
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "18.04-LTS"
+    version   = "latest"
+  }
 }

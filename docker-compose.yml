@@ -1,0 +1,15 @@
+version: '3.7'
+
+services:
+  terraform:
+    image: hashicorp/terraform:0.12.21
+    volumes:
+      - .:/infra
+    working_dir: /infra
+    environment:
+      - ARM_SUBSCRIPTION_ID=${ARM_SUBSCRIPTION_ID}
+      - ARM_TENANT_ID=${ARM_TENANT_ID}
+      - ARM_CLIENT_ID=${ARM_CLIENT_ID}
+      - ARM_CLIENT_SECRET=${ARM_CLIENT_SECRET}
+      - ARM_ACCESS_KEY=${ARM_ACCESS_KEY}
+      

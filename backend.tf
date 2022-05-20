@@ -9,6 +9,7 @@ resource "azurerm_lb" "backend" {
   name                = "lb-backend"
   location            = var.resource_group_location
   resource_group_name = var.resource_group
+  sku                 = "Standard"
 
   frontend_ip_configuration {
     name      = "localIPAddress"
@@ -95,9 +96,9 @@ resource "azurerm_network_interface_security_group_association" "association-bac
   network_security_group_id = azurerm_network_security_group.nsg-backend.id
 }
 
-#resource "azurerm_network_interface_backend_address_pool_association" "backend" {
-#  count                   = length(azurerm_network_interface.backend)
-#  network_interface_id    = azurerm_network_interface.backend[count.index].id
-#  ip_configuration_name   = "ip-back-config"
-#  backend_address_pool_id = azurerm_lb_backend_address_pool.backend.id
-#}
+resource "azurerm_network_interface_backend_address_pool_association" "backend" {
+  count                   = length(azurerm_network_interface.backend)
+  network_interface_id    = azurerm_network_interface.backend[count.index].id
+  ip_configuration_name   = "ip-back-config"
+  backend_address_pool_id = azurerm_lb_backend_address_pool.backend.id
+}

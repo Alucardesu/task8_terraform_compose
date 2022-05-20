@@ -1,15 +1,9 @@
-resource "azurerm_subnet" "vm-public" {
-  name                 = var.resource_subnet_public
-  resource_group_name  = var.resource_group
-  virtual_network_name = var.resource_virtual_network
-  address_prefixes     = ["10.0.2.0/24"]
-}
-
 resource "azurerm_public_ip" "vm-public" {
   name                = var.resource_public_ip
   resource_group_name = var.resource_group
   location            = var.resource_group_location
   allocation_method   = "Dynamic"
+  depends_on = [azurerm_resource_group.rg]
 }
 
 resource "azurerm_network_interface" "vm-public" {
@@ -41,6 +35,7 @@ resource "azurerm_network_security_group" "nsg-public" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
+  depends_on = [azurerm_resource_group.rg]
 }
 
 resource "azurerm_network_interface_security_group_association" "association-public" {
@@ -60,7 +55,7 @@ resource "azurerm_linux_virtual_machine" "vm-public" {
 
   admin_ssh_key {
     username   = "adminuser"
-    public_key = file("~/.ssh/id_rsa.pub")
+    public_key =  tls_private_key.ssh-key.public_key_openssh
   }
 
   os_disk {
@@ -74,4 +69,21 @@ resource "azurerm_linux_virtual_machine" "vm-public" {
     sku       = "18.04-LTS"
     version   = "latest"
   }
+  depends_on = [tls_private_key.ssh-key]
+}
+
+resource "azurerm_virtual_machine_extension" "vm-public" {
+  name                 = "ssh-key"
+  virtual_machine_id   = azurerm_linux_virtual_machine.vm-public.id
+  publisher            = "Microsoft.Azure.Extensions"
+  type                 = "CustomScript"
+  type_handler_version = "2.0"
+
+  settings = <<SETTINGS
+    {
+        "commandToExecute": "hostname > hola.txt"
+    }
+SETTINGS
+
+#  depends_on = [local_file.ssh-key]
 }

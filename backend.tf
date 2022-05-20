@@ -1,25 +1,38 @@
-resource "azurerm_subnet" "backend" {
-  name                 = var.resource_subnet_backend
-  resource_group_name  = var.resource_group
-  virtual_network_name = var.resource_virtual_network
-  address_prefixes     = ["10.0.3.0/24"]
-}
-
 resource "azurerm_lb" "backend" {
   name                = "lb-backend"
   location            = var.resource_group_location
   resource_group_name = var.resource_group
-  sku                 = "Standard"
+#  sku                 = "Standard"
 
   frontend_ip_configuration {
     name      = "localIPAddress"
     subnet_id = azurerm_subnet.backend.id
   }
+
 }
 
 resource "azurerm_lb_backend_address_pool" "backend" {
   loadbalancer_id = azurerm_lb.backend.id
   name            = "BackEndAddressPool"
+}
+
+resource "azurerm_lb_probe" "backend" {
+  loadbalancer_id = azurerm_lb.backend.id
+  name            = "ssh-running-probe"
+  port            = 22
+  resource_group_name = var.resource_group
+}
+
+resource "azurerm_lb_rule" "backend" {
+  loadbalancer_id                = azurerm_lb.backend.id
+  name                           = "LBRule"
+  protocol                       = "Tcp"
+  frontend_port                  = 22
+  backend_port                   = 22
+  frontend_ip_configuration_name = "localIPAddress"
+  resource_group_name = var.resource_group
+  backend_address_pool_ids = azurerm_lb_backend_address_pool.backend.*.id
+  probe_id                 = azurerm_lb_probe.backend.id
 }
 
 resource "azurerm_network_interface" "backend" {
@@ -35,28 +48,29 @@ resource "azurerm_network_interface" "backend" {
   }
 }
 
- #resource "azurerm_availability_set" "backend" {
- #  name                         = "avail-backend"
- #  location                     = var.resource_group_location
- #  resource_group_name          = var.resource_group
- #  platform_fault_domain_count  = 2
- #  platform_update_domain_count = 2
- #  managed                      = true
- #}
+ resource "azurerm_availability_set" "backend" {
+   name                         = "avail-backend"
+   location                     = var.resource_group_location
+   resource_group_name          = var.resource_group
+   platform_fault_domain_count  = 2
+   platform_update_domain_count = 2
+   managed                      = true
+   depends_on = [azurerm_resource_group.rg]
+ }
 
 resource "azurerm_linux_virtual_machine" "backend" {
   count               = 2
   name                = "${var.resource_linux_virtual_machine_backend}-${count.index}"
   resource_group_name = var.resource_group
   location            = var.resource_group_location
- # availability_set_id = azurerm_availability_set.backend.id
+  availability_set_id = azurerm_availability_set.backend.id
   size                = "Standard_B1ls"
   admin_username      = "adminuser"
   network_interface_ids = [element(azurerm_network_interface.backend.*.id, count.index)]
 
   admin_ssh_key {
     username   = "adminuser"
-    public_key = file("~/.ssh/id_rsa.pub")
+    public_key =  tls_private_key.ssh-key.public_key_openssh
   }
 
   os_disk {
@@ -70,6 +84,8 @@ resource "azurerm_linux_virtual_machine" "backend" {
     sku       = "18.04-LTS"
     version   = "latest"
   }
+
+  depends_on = [tls_private_key.ssh-key]
 }
 
 resource "azurerm_network_security_group" "nsg-backend" {
@@ -88,12 +104,15 @@ resource "azurerm_network_security_group" "nsg-backend" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
+  depends_on = [azurerm_resource_group.rg]
+  
 }
 
 resource "azurerm_network_interface_security_group_association" "association-backend" {
   count                     = length(azurerm_network_interface.backend)
   network_interface_id      = azurerm_network_interface.backend[count.index].id
   network_security_group_id = azurerm_network_security_group.nsg-backend.id
+  depends_on = [azurerm_resource_group.rg]
 }
 
 resource "azurerm_network_interface_backend_address_pool_association" "backend" {

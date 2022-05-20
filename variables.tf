@@ -1,9 +1,9 @@
 variable "resource_group_location" {
-  default     = "northcentralus"
+  default     = "centralus"
   description = "Location of the resource group."
 }
 variable "resource_group" {
-  default     = "rd7task8"
+  default     = "rd7task8-cus"
   description = "Current resource group to work task8"
 }
 variable "resource_virtual_network" {
@@ -18,9 +18,9 @@ variable "resource_subnet_backend" {
   default     = "snet-backend"
   description = "Internal subnet for background operations"
 }
-variable "resource_subnet_foreground" {
-  default     = "snet-foreground"
-  description = "Internal subnet for foreground operations"
+variable "resource_subnet_frontend" {
+  default     = "snet-frontend"
+  description = "Internal subnet for frontend operations"
 }
 
 variable "resource_network_interface_public" {
@@ -33,9 +33,9 @@ variable "resource_network_interface_backend" {
   description = "Virtual Interface for backend VMs"
 }
 
-variable "resource_network_interface_foreground" {
-  default     = "nic-task8-foreground"
-  description = "Virtual Interface for foreground VMs"
+variable "resource_network_interface_frontend" {
+  default     = "nic-task8-frontend"
+  description = "Virtual Interface for frontend VMs"
 }
 
 variable "resource_public_ip" {

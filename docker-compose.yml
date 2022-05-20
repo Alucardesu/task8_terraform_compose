@@ -5,7 +5,7 @@ services:
     image: hashicorp/terraform:1.2.0
     volumes:
       - .:/infra
-      - ${PWD}/id_rsa.pub:/root/.ssh/id_rsa.pub
+#      - ${PWD}/id_rsa.pub:/root/.ssh/id_rsa.pub
     working_dir: /infra
     environment:
       - ARM_SUBSCRIPTION_ID=${ARM_SUBSCRIPTION_ID}

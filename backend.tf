@@ -34,6 +34,43 @@ resource "azurerm_network_interface" "backend" {
   }
 }
 
+ #resource "azurerm_availability_set" "backend" {
+ #  name                         = "avail-backend"
+ #  location                     = var.resource_group_location
+ #  resource_group_name          = var.resource_group
+ #  platform_fault_domain_count  = 2
+ #  platform_update_domain_count = 2
+ #  managed                      = true
+ #}
+
+resource "azurerm_linux_virtual_machine" "backend" {
+  count               = 2
+  name                = "${var.resource_linux_virtual_machine_backend}-${count.index}"
+  resource_group_name = var.resource_group
+  location            = var.resource_group_location
+ # availability_set_id = azurerm_availability_set.backend.id
+  size                = "Standard_B1ls"
+  admin_username      = "adminuser"
+  network_interface_ids = [element(azurerm_network_interface.backend.*.id, count.index)]
+
+  admin_ssh_key {
+    username   = "adminuser"
+    public_key = file("~/.ssh/id_rsa.pub")
+  }
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "18.04-LTS"
+    version   = "latest"
+  }
+}
+
 resource "azurerm_network_security_group" "nsg-backend" {
   name                = var.resource_nsg_backend
   location            = var.resource_group_location
@@ -58,31 +95,9 @@ resource "azurerm_network_interface_security_group_association" "association-bac
   network_security_group_id = azurerm_network_security_group.nsg-backend.id
 }
 
-resource "azurerm_linux_virtual_machine" "backend" {
-  count               = 2
-  name                = "${var.resource_linux_virtual_machine_backend}-${count.index}"
-  resource_group_name = var.resource_group
-  location            = var.resource_group_location
-  size                = "Standard_B1ls"
-  admin_username      = "adminuser"
-  network_interface_ids = [
-    azurerm_network_interface.backend[count.index].id,
-  ]
-
-  admin_ssh_key {
-    username   = "adminuser"
-    public_key = file("~/.ssh/id_rsa.pub")
-  }
-
-  os_disk {
-    caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
-  }
-
-  source_image_reference {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "18.04-LTS"
-    version   = "latest"
-  }
-}
+#resource "azurerm_network_interface_backend_address_pool_association" "backend" {
+#  count                   = length(azurerm_network_interface.backend)
+#  network_interface_id    = azurerm_network_interface.backend[count.index].id
+#  ip_configuration_name   = "ip-back-config"
+#  backend_address_pool_id = azurerm_lb_backend_address_pool.backend.id
+#}

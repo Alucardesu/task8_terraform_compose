@@ -1,3 +1,4 @@
 *.plan
 .terraform/*
 id_rsa
+.terraform.lock*

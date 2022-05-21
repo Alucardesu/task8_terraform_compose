@@ -3,7 +3,7 @@ resource "azurerm_public_ip" "vm-public" {
   resource_group_name = var.resource_group
   location            = var.resource_group_location
   allocation_method   = "Dynamic"
-  depends_on = [azurerm_resource_group.rg]
+  depends_on          = [azurerm_resource_group.rg]
 }
 
 resource "azurerm_network_interface" "vm-public" {
@@ -55,7 +55,7 @@ resource "azurerm_linux_virtual_machine" "vm-public" {
 
   admin_ssh_key {
     username   = "adminuser"
-    public_key =  tls_private_key.ssh-key.public_key_openssh
+    public_key = tls_private_key.ssh-key.public_key_openssh
   }
 
   os_disk {

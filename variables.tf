@@ -84,29 +84,29 @@ variable "resource_nsg_frontend" {
 }
 ##########################################################################################
 variable "backend_address_pool_name" {
-    default = "vnet-task8-beap"
+  default = "vnet-task8-beap"
 }
 
 variable "frontend_port_name" {
-    default = "vnet-task8-feport"
+  default = "vnet-task8-feport"
 }
 
 variable "frontend_ip_configuration_name" {
-    default = "vnet-task8-feip"
+  default = "vnet-task8-feip"
 }
 
 variable "http_setting_name" {
-    default = "vnet-task8-be-htst"
+  default = "vnet-task8-be-htst"
 }
 
 variable "listener_name" {
-    default = "vnet-task8-httplstn"
+  default = "vnet-task8-httplstn"
 }
 
 variable "request_routing_rule_name" {
-    default = "vnet-task8-rqrt"
+  default = "vnet-task8-rqrt"
 }
 
 variable "redirect_configuration_name" {
-    default = "vnet-task8-rdrcfg"
+  default = "vnet-task8-rdrcfg"
 }

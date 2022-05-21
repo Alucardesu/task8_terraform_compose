@@ -4,7 +4,7 @@ resource "azurerm_public_ip" "frontend" {
   location            = var.resource_group_location
   allocation_method   = "Static"
   sku                 = "Standard"
-  depends_on = [azurerm_resource_group.rg]
+  depends_on          = [azurerm_resource_group.rg]
 }
 
 
@@ -78,7 +78,7 @@ resource "azurerm_network_interface" "nic" {
 }
 
 resource "azurerm_network_interface_application_gateway_backend_address_pool_association" "nic-assoc01" {
-  count = 2
+  count                   = 2
   network_interface_id    = azurerm_network_interface.nic[count.index].id
   ip_configuration_name   = "ip-front-back-config"
   backend_address_pool_id = azurerm_application_gateway.agw-network.backend_address_pool[0].id
@@ -91,16 +91,16 @@ resource "azurerm_linux_virtual_machine" "frontend" {
   name                = "${var.resource_linux_virtual_machine_frontend}-${count.index}"
   resource_group_name = var.resource_group
   location            = var.resource_group_location
-#  availability_set_id = azurerm_availability_set.frontend.id
-  size                = "Standard_B1ls"
-  admin_username      = "adminuser"
+  #  availability_set_id = azurerm_availability_set.frontend.id
+  size           = "Standard_B1ls"
+  admin_username = "adminuser"
   network_interface_ids = [
-       azurerm_network_interface.nic[count.index].id,
+    azurerm_network_interface.nic[count.index].id,
   ]
 
   admin_ssh_key {
     username   = "adminuser"
-    public_key =  tls_private_key.ssh-key.public_key_openssh
+    public_key = tls_private_key.ssh-key.public_key_openssh
   }
 
   os_disk {
@@ -130,26 +130,24 @@ resource "azurerm_network_security_group" "nsg-frontend" {
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
-    destination_port_ranges     = [22,80]
+    destination_port_ranges    = [22, 80]
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
   depends_on = [azurerm_resource_group.rg]
-  
+
 }
 
 resource "azurerm_network_interface_security_group_association" "association-frontend" {
   count                     = length(azurerm_network_interface.nic)
   network_interface_id      = azurerm_network_interface.nic[count.index].id
   network_security_group_id = azurerm_network_security_group.nsg-frontend.id
-  depends_on = [azurerm_resource_group.rg]
+  depends_on                = [azurerm_resource_group.rg]
 }
 
- 
-
 resource "azurerm_virtual_machine_extension" "frontend" {
-  count = 2
-  name                 = "nginx-hostname"
+  count                = 2
+  name                 = "nginx-hostname-${count.index}"
   virtual_machine_id   = azurerm_linux_virtual_machine.frontend[count.index].id
   publisher            = "Microsoft.Azure.Extensions"
   type                 = "CustomScript"
@@ -162,5 +160,5 @@ resource "azurerm_virtual_machine_extension" "frontend" {
     }
 SETTINGS
 
-#  depends_on = [local_file.ssh-key]
+  #  depends_on = [local_file.ssh-key]
 }

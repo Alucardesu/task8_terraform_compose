@@ -2,3 +2,4 @@
 .terraform/*
 id_rsa
 .terraform.lock*
+id_rsa

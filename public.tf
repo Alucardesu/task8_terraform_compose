@@ -72,18 +72,18 @@ resource "azurerm_linux_virtual_machine" "vm-public" {
   depends_on = [tls_private_key.ssh-key]
 }
 
-resource "azurerm_virtual_machine_extension" "vm-public" {
-  name                 = "ssh-key"
-  virtual_machine_id   = azurerm_linux_virtual_machine.vm-public.id
-  publisher            = "Microsoft.Azure.Extensions"
-  type                 = "CustomScript"
-  type_handler_version = "2.0"
-
-  settings = <<SETTINGS
-    {
-        "commandToExecute": "hostname > hola.txt"
-    }
-SETTINGS
-
-#  depends_on = [local_file.ssh-key]
-}
+#resource "azurerm_virtual_machine_extension" "vm-public" {
+#  name                 = "ssh-key"
+#  virtual_machine_id   = azurerm_linux_virtual_machine.vm-public.id
+#  publisher            = "Microsoft.Azure.Extensions"
+#  type                 = "CustomScript"
+#  type_handler_version = "2.0"
+#
+#  settings = <<SETTINGS
+#    {
+#        "commandToExecute": "hostname > hola.txt"
+#    }
+#SETTINGS
+#
+##  depends_on = [local_file.ssh-key]
+#}

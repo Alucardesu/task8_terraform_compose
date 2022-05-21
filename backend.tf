@@ -2,7 +2,6 @@ resource "azurerm_lb" "backend" {
   name                = "lb-backend"
   location            = var.resource_group_location
   resource_group_name = var.resource_group
-#  sku                 = "Standard"
 
   frontend_ip_configuration {
     name      = "localIPAddress"

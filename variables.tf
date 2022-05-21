@@ -33,6 +33,11 @@ variable "resource_network_interface_backend" {
   description = "Virtual Interface for backend VMs"
 }
 
+variable "resource_network_interface_frontend_backend" {
+  default     = "nic-task8-frontend-backend"
+  description = "Virtual Interface for backend VMs"
+}
+
 variable "resource_network_interface_frontend" {
   default     = "nic-task8-frontend"
   description = "Virtual Interface for frontend VMs"
@@ -42,6 +47,12 @@ variable "resource_public_ip" {
   default     = "pip-publicJump"
   description = "Dynamic public IP for jump VM"
 }
+
+variable "resource_public_ip_frontend" {
+  default     = "pip-frontend"
+  description = "Dynamic public IP for front end app"
+}
+
 variable "resource_linux_virtual_machine_public" {
   default     = "vm-publicJump"
   description = "Public VM to jump inside the internal network"
@@ -65,4 +76,37 @@ variable "resource_nsg_public" {
 variable "resource_nsg_backend" {
   default     = "nsg-backend"
   description = "Network security group for our backend LB"
+}
+
+variable "resource_nsg_frontend" {
+  default     = "nsg-frontend"
+  description = "Network security group for our frontend AppGateway"
+}
+##########################################################################################
+variable "backend_address_pool_name" {
+    default = "vnet-task8-beap"
+}
+
+variable "frontend_port_name" {
+    default = "vnet-task8-feport"
+}
+
+variable "frontend_ip_configuration_name" {
+    default = "vnet-task8-feip"
+}
+
+variable "http_setting_name" {
+    default = "vnet-task8-be-htst"
+}
+
+variable "listener_name" {
+    default = "vnet-task8-httplstn"
+}
+
+variable "request_routing_rule_name" {
+    default = "vnet-task8-rqrt"
+}
+
+variable "redirect_configuration_name" {
+    default = "vnet-task8-rdrcfg"
 }

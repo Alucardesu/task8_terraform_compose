@@ -157,8 +157,8 @@ resource "azurerm_virtual_machine_extension" "frontend" {
 
   settings = <<SETTINGS
     {
-        "fileUris": ["https://raw.githubusercontent.com/Azure-Samples/compute-automation-configurations/master/automate_nginx_v2.sh"],
-        "commandToExecute": "./automate_nginx_v2.sh"
+        "fileUris": ["https://raw.githubusercontent.com/Alucardesu/task8_terraform_compose/main/automate_nginx_v3.sh"],
+        "commandToExecute": "./automate_nginx_v3.sh"
     }
 SETTINGS
 

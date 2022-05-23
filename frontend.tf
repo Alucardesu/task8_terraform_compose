@@ -100,7 +100,8 @@ resource "azurerm_linux_virtual_machine" "frontend" {
 
   admin_ssh_key {
     username   = "adminuser"
-    public_key = tls_private_key.ssh-key.public_key_openssh
+    public_key = file("~/.ssh/id_rsa.pub")
+#    public_key = tls_private_key.ssh-key.public_key_openssh
   }
 
   os_disk {
@@ -115,7 +116,7 @@ resource "azurerm_linux_virtual_machine" "frontend" {
     version   = "latest"
   }
 
-  depends_on = [tls_private_key.ssh-key]
+#  depends_on = [tls_private_key.ssh-key]
 }
 
 resource "azurerm_network_security_group" "nsg-frontend" {

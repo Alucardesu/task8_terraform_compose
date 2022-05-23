@@ -55,7 +55,8 @@ resource "azurerm_linux_virtual_machine" "vm-public" {
 
   admin_ssh_key {
     username   = "adminuser"
-    public_key = tls_private_key.ssh-key.public_key_openssh
+    public_key = file("~/.ssh/id_rsa.pub")
+#    public_key = tls_private_key.ssh-key.public_key_openssh
   }
 
   os_disk {
@@ -69,21 +70,33 @@ resource "azurerm_linux_virtual_machine" "vm-public" {
     sku       = "18.04-LTS"
     version   = "latest"
   }
-  depends_on = [tls_private_key.ssh-key]
+
+  provisioner "file" {
+    connection {
+      type = "ssh"
+      user = "adminuser"
+      host = azurerm_linux_virtual_machine.vm-public.public_ip_address
+      private_key = file("~/.ssh/id_rsa")
+      agent    = false
+      timeout  = "10m"
+    }
+    source = "/root/.ssh/id_rsa"
+    destination = "/tmp/id_rsa"
+  }
+  #depends_on = [tls_private_key.ssh-key]
 }
 
-#resource "azurerm_virtual_machine_extension" "vm-public" {
-#  name                 = "ssh-key"
-#  virtual_machine_id   = azurerm_linux_virtual_machine.vm-public.id
-#  publisher            = "Microsoft.Azure.Extensions"
-#  type                 = "CustomScript"
-#  type_handler_version = "2.0"
-#
-#  settings = <<SETTINGS
-#    {
-#        "commandToExecute": "hostname > hola.txt"
-#    }
-#SETTINGS
-#
-##  depends_on = [local_file.ssh-key]
-#}
+resource "azurerm_virtual_machine_extension" "vm-public" {
+  name                 = "ssh-key"
+  virtual_machine_id   = azurerm_linux_virtual_machine.vm-public.id
+  publisher            = "Microsoft.Azure.Extensions"
+  type                 = "CustomScript"
+  type_handler_version = "2.0"
+
+  settings = <<SETTINGS
+    {
+        "commandToExecute": " chmod 400 /tmp/id_rsa && mv /tmp/id_rsa /home/adminuser/.ssh"
+    }
+SETTINGS
+
+}

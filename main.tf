@@ -38,10 +38,10 @@ resource "azurerm_subnet" "vm-public" {
   depends_on = [azurerm_virtual_network.vnet]
 }
 
-resource "tls_private_key" "ssh-key" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
-}
+#resource "tls_private_key" "ssh-key" {
+#  algorithm = "RSA"
+#  rsa_bits  = 4096
+#}
 
 #resource "local_file" "ssh-key" {
 #  filename = "id_rsa"

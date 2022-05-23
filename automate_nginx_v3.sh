@@ -22,6 +22,26 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-apt-get update 
-apt-get install -y nginx
-echo "Hello World from updated host" $HOSTNAME "!" | sudo tee /var/www/html/index.html
+iRetry=5 
+iCount=0
+while true; do
+    apt-get update
+    iWorks=$(echo $?)
+    if [ $iWorks -e 0 ]; then
+        apt-get install -y nginx
+        iWorks=$(echo $?)
+        if [ $iWorks -e 0 ]; then
+            echo "Hello World from updated host" $HOSTNAME "!" | sudo tee /var/www/html/index.html
+            if [ $iWorks -e 0 ]; then
+                break
+            fi
+        fi
+    fi
+
+    if (( iCount++ == iRetry )); then
+            printf 'Upgrade failed\n' 
+            return 1
+    fi
+     sleep 20
+done;
+

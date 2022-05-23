@@ -92,7 +92,7 @@ resource "azurerm_linux_virtual_machine" "frontend" {
   resource_group_name = var.resource_group
   location            = var.resource_group_location
   #  availability_set_id = azurerm_availability_set.frontend.id
-  size           = "Standard_B1ls"
+  size           = "Standard_B1s"
   admin_username = "adminuser"
   network_interface_ids = [
     azurerm_network_interface.nic[count.index].id,

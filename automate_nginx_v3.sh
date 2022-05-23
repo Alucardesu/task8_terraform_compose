@@ -41,7 +41,9 @@ while true; do
     if (( iCount++ == iRetry )); then
             printf 'Upgrade failed\n' 
             return 1
+    else
+         sleep 30
     fi
-     sleep 20
+   
 done;
 

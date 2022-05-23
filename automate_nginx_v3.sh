@@ -33,7 +33,7 @@ while true; do
         if [ $iWorks -eq 0 ]; then
             echo "Hello World from updated host" $HOSTNAME "!" | sudo tee /var/www/html/index.html
             if [ $iWorks -eq 0 ]; then
-                break
+                return 0
             fi
         fi
     fi
@@ -42,6 +42,6 @@ while true; do
             printf 'Upgrade failed\n' 
             return 1
     fi
-     sleep 20
+    sleep 20
 done;
 

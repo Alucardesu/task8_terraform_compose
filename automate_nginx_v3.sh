@@ -44,6 +44,5 @@ while true; do
     else
          sleep 30
     fi
-   
 done;
 

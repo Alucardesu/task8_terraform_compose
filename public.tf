@@ -65,8 +65,8 @@ resource "azurerm_linux_virtual_machine" "vm-public" {
 
   source_image_reference {
     publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "18.04-LTS"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "20_04-lts-gen2"
     version   = "latest"
   }
 
@@ -98,7 +98,7 @@ resource "azurerm_virtual_machine_extension" "vm-public" {
   settings = <<SETTINGS
     {
         "fileUris": ["https://raw.githubusercontent.com/Alucardesu/task8_terraform_compose/main/setupAnsibleJump.sh"],
-        "commandToExecute": "./setupAnsibleJump.sh"
+        "commandToExecute": "./setupAnsibleJump.sh ${TF_VAR_ARM_SUBSCRIPTION_ID} ${TF_VAR_ARM_CLIENT_ID} ${TF_VAR_ARM_CLIENT_SECRET} ${TF_VAR_ARM_TENANT_ID}"
     }
 SETTINGS
 

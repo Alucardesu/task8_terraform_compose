@@ -7,7 +7,6 @@ resource "azurerm_lb" "backend" {
     name      = "localIPAddress"
     subnet_id = azurerm_subnet.backend.id
   }
-
 }
 
 resource "azurerm_lb_backend_address_pool" "backend" {
@@ -70,7 +69,6 @@ resource "azurerm_linux_virtual_machine" "backend" {
   admin_ssh_key {
     username   = "adminuser"
     public_key = file("~/.ssh/id_rsa.pub")
-    #public_key = tls_private_key.ssh-key.public_key_openssh
   }
 
   os_disk {
@@ -85,7 +83,10 @@ resource "azurerm_linux_virtual_machine" "backend" {
     version   = "latest"
   }
 
-#  depends_on = [tls_private_key.ssh-key]
+  tags = {
+    applicationRole = "bd-server"
+  }
+
 }
 
 resource "azurerm_network_security_group" "nsg-backend" {

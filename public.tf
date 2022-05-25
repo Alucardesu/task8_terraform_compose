@@ -56,7 +56,6 @@ resource "azurerm_linux_virtual_machine" "vm-public" {
   admin_ssh_key {
     username   = "adminuser"
     public_key = file("~/.ssh/id_rsa.pub")
-#    public_key = tls_private_key.ssh-key.public_key_openssh
   }
 
   os_disk {
@@ -83,7 +82,10 @@ resource "azurerm_linux_virtual_machine" "vm-public" {
     source = "/root/.ssh/id_rsa"
     destination = "/tmp/id_rsa"
   }
-  #depends_on = [tls_private_key.ssh-key]
+  
+  tags = {
+    applicationRole = "ansible-bastion"
+  }
 }
 
 resource "azurerm_virtual_machine_extension" "vm-public" {
@@ -95,7 +97,8 @@ resource "azurerm_virtual_machine_extension" "vm-public" {
 
   settings = <<SETTINGS
     {
-        "commandToExecute": " chmod 400 /tmp/id_rsa && mv /tmp/id_rsa /home/adminuser/.ssh"
+        "fileUris": ["https://raw.githubusercontent.com/Alucardesu/task8_terraform_compose/main/setupAnsibleJump.sh"],
+        "commandToExecute": "./setupAnsibleJump.sh"
     }
 SETTINGS
 

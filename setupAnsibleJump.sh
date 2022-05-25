@@ -3,7 +3,7 @@ sUser="adminuser"
 sHome="/home/$sUser"
 
 #Set up ssh key
-if [ -z /tmp/id_rsa ]; then
+if [ -e /tmp/id_rsa ]; then
     chmod 400 /tmp/id_rsa
     mv /tmp/id_rsa $sHome/.ssh
 fi
@@ -48,9 +48,9 @@ EOF
     fi
 
     if (( iCount++ == iRetry )); then
-            echo 'Installation Failed' 
-            return 1
+        echo 'Installation Failed' 
+        return 1
     else
-         sleep 30
+        sleep 30
     fi
 done;

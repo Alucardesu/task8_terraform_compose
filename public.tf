@@ -98,7 +98,7 @@ resource "azurerm_virtual_machine_extension" "vm-public" {
   settings = <<SETTINGS
     {
         "fileUris": ["https://raw.githubusercontent.com/Alucardesu/task8_terraform_compose/main/setupAnsibleJump.sh"],
-        "commandToExecute": "./setupAnsibleJump.sh ${TF_VAR_ARM_SUBSCRIPTION_ID} ${TF_VAR_ARM_CLIENT_ID} ${TF_VAR_ARM_CLIENT_SECRET} ${TF_VAR_ARM_TENANT_ID}"
+        "commandToExecute": "./setupAnsibleJump.sh"
     }
 SETTINGS
 

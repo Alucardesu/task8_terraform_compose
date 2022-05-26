@@ -91,8 +91,8 @@ resource "azurerm_linux_virtual_machine" "frontend" {
   name                = "${var.resource_linux_virtual_machine_frontend}-${count.index}"
   resource_group_name = var.resource_group
   location            = var.resource_group_location
-  size           = "Standard_B1ls"
-  admin_username = "adminuser"
+  size                = "Standard_B1ls"
+  admin_username      = "adminuser"
   network_interface_ids = [
     azurerm_network_interface.nic[count.index].id,
   ]
@@ -113,7 +113,7 @@ resource "azurerm_linux_virtual_machine" "frontend" {
     sku       = "20_04-lts-gen2"
     version   = "latest"
   }
-  
+
   tags = {
     applicationRole = "web-server"
   }
@@ -126,13 +126,25 @@ resource "azurerm_network_security_group" "nsg-frontend" {
   resource_group_name = var.resource_group
 
   security_rule {
-    name                       = "sg-allow-ssh-http"
+    name                       = "sg-allow-ssh"
     priority                   = 100
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
-    destination_port_ranges    = [22, 80]
+    destination_port_range     = 22
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "sg-allow-http"
+    priority                   = 200
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = 80
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }

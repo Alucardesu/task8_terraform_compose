@@ -105,6 +105,18 @@ resource "azurerm_network_security_group" "nsg-backend" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
+
+  security_rule {
+    name                       = "sg-allow-postgresql"
+    priority                   = 200
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "5432"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
   depends_on = [azurerm_resource_group.rg]
 
 }

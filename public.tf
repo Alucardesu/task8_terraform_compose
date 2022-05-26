@@ -72,17 +72,17 @@ resource "azurerm_linux_virtual_machine" "vm-public" {
 
   provisioner "file" {
     connection {
-      type = "ssh"
-      user = "adminuser"
-      host = azurerm_linux_virtual_machine.vm-public.public_ip_address
+      type        = "ssh"
+      user        = "adminuser"
+      host        = azurerm_linux_virtual_machine.vm-public.public_ip_address
       private_key = file("~/.ssh/id_rsa")
-      agent    = false
-      timeout  = "10m"
+      agent       = false
+      timeout     = "10m"
     }
-    source = "/root/.ssh/id_rsa"
+    source      = "/root/.ssh/id_rsa"
     destination = "/tmp/id_rsa"
   }
-  
+
   tags = {
     applicationRole = "ansible-bastion"
   }

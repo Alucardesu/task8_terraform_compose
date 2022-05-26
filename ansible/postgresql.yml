@@ -14,6 +14,7 @@
         - postgresql
         - postgresql-contrib
         - python3-psycopg2
+        - acl
   tasks:
     - name: "Find out if PostgreSQL is initialized"
       ansible.builtin.stat:
@@ -68,6 +69,13 @@
       become: yes
       become_user: postgres
       notify: restart postgres
+
+    - name: "Simple SELECT query"
+      postgresql_query:
+        db: "{{ db_name }}"
+        login_user: "{{ db_user }}"
+        login_password: "{{ db_password }}"
+        query: SELECT version()
 
   handlers:
     - name: restart postgres

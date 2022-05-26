@@ -29,6 +29,7 @@ while true; do
 [defaults] 
 inventory = ~/ansible/myazure_rm.yml 
 roles_path = ~/ansible/roles 
+host_key_checking = False
 EOF
             #TODO: Temporal local credentials
             cat <<EOF > $sHome/.azure/credentials 
@@ -39,7 +40,7 @@ secret=$3
 tenant=$4
 EOF
             #Downloading Dynamic Inventory Setup
-            su - $sUser -c "wget -q -O ~/ansible/myazure_rm.yml 'https://raw.githubusercontent.com/Alucardesu/task8_terraform_compose/main/myazure_rm.yml'"
+            su - $sUser -c "wget -q -O ~/ansible/myazure_rm.yml 'https://raw.githubusercontent.com/Alucardesu/task8_terraform_compose/main/ansible/myazure_rm.yml'"
             iWorks=$(echo $?)
             if [ $iWorks -eq 0 ]; then
                 break;

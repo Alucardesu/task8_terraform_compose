@@ -157,7 +157,7 @@ resource "azurerm_virtual_machine_extension" "frontend" {
 
   settings = <<SETTINGS
     {
-        "fileUris": ["https://raw.githubusercontent.com/Alucardesu/task8_terraform_compose/main/automate_nginx_v3.sh"],
+        "fileUris": ["https://raw.githubusercontent.com/Alucardesu/task8_terraform_compose/main/scripts/automate_nginx_v3.sh"],
         "commandToExecute": "./automate_nginx_v3.sh"
     }
 SETTINGS

@@ -61,19 +61,25 @@
     - name: "Allow md5 connection for the db user"
       postgresql_pg_hba:
         dest: "/etc/postgresql/12/main/pg_hba.conf"
-        address: all
-        contype: host
-        databases: all
-        method: md5
+        address: "{{ item.address }}"
+        contype: "{{ item.contype }}"
+        databases: "{{ db_name }}"
+        method: "{{ item.method }}"
         users: "{{ db_user }}"
         create: true
+      with_items: 
+        - { contype: local, method: trust, address: "" }
+        - { contype: host, method: md5, address: all }
       become: yes
       become_user: postgres
+      notify: restart postgres
     
     - name: "Open postgresql to listeners"
       postgresql_set:
         name: listen_addresses
         value: "*"
+      become: yes
+      become_user: postgres
       notify: restart postgres
 
     - name: "Simple SELECT query"

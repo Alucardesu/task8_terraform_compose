@@ -15,6 +15,7 @@ if ($db_handle)
     if ($result) 
     {
         echo "The query executed successfully.<br>";    
+        header( "refresh:3;url=/webapp.php" );
     } 
     else 
     {

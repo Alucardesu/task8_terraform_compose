@@ -15,7 +15,6 @@
         - php-pgsql
 
   tasks:
-
    - name: "Sets Nginx conf file"
      template:
        src: "files/nginx.conf.j2"
@@ -34,10 +33,18 @@
        state: absent
      notify: Reload Nginx
 
+   - name: "Sending webapp"
+     copy:
+       src: "files/webapp.php"
+       dest: "/var/www/html/webapp.php"       
+
    - name: "Sets Up App"
      template:
-       src: "files/webapp.php.j2"
-       dest: "/var/www/html/webapp.php"
+       src: "files/{{ item }}.j2"
+       dest: "/var/www/html/{{ item }}"
+     loop:
+       - insert.php
+       - select.php
 
 # Handlers
   handlers:

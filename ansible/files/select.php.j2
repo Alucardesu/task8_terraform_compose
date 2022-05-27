@@ -5,19 +5,30 @@ $db_handle = pg_connect("host={{ lb_ip }} dbname={{ db_name }} user={{ db_user }
 if ($db_handle) 
 {
 
-    $sql = "SELECT (item,quantity) FROM inventory";
+    $sql = "SELECT item,quantity FROM inventory";
     $result = pg_exec($db_handle, $sql);
 
-    for ($row = 0; $row < pg_numrows($result); $row++) 
+    if ($result) 
+    {
+        echo "<style> table, th, td { border: 1px solid black; } </style> <body> <table>";
+
+        while ($row = pg_fetch_assoc($result)) 
+        {    
+            echo "<tr>";
+            echo "<td>" . $row['item'] . "</td>";
+            echo "<td>" . $row['quantity'] . "</td>";
+            echo "</tr>";
+        }
+        echo "</table>";
+        echo "<a href='webapp.php'>Go back</a>";
+        echo "</body>";
+    } 
+    else 
     {
 
-        $inventory_name = pg_result($result, $row, 'item');    
-        echo $inventory_name ." ";    
-        $quantity = pg_result($result, $row, 'quantity');    
-        echo $quantity ."<br>";
-        
-    }
-    
+        echo "The query failed with the following error:<br>";    
+        echo pg_errormessage($db_handle);    
+    }    
     
     pg_close($db_handle);
 

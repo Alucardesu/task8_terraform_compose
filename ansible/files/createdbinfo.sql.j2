@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS inventory (           
+  item varchar(20) NOT NULL,
+  quantity int NOT NULL
+  );          
+ALTER TABLE inventory OWNER TO "{{ db_user }}";

@@ -3,7 +3,7 @@
   become: yes
 
   vars_files:
-    - vars.yml
+    - vars/default.yml
 
   pre_tasks:
     - name: "Install packages"
@@ -68,8 +68,7 @@
         users: "{{ db_user }}"
         create: true
       with_items: 
-        - { contype: local, method: trust, address: "" }
-        - { contype: host, method: md5, address: all }
+        - { contype: host, method: md5, address: all } #For regular use, may need to change address consumer to LB
       become: yes
       become_user: postgres
       register: restart_postgres
@@ -88,9 +87,19 @@
         state: restarted
       when: restart_postgres.changed
 
-    - name: "Simple SELECT query"
-      postgresql_query:
-        db: "{{ db_name }}"
-        login_user: "{{ db_user }}"
-        login_password: "{{ db_password }}"
-        query: SELECT version()
+    - name: "Set up database script"
+      template:
+        src: "files/createdbinfo.sql.j2"
+        dest: "/tmp/createdbinfo.sql"
+
+    - name: "Run script"
+      become: true
+      become_user: postgres
+      shell: psql {{ db_name }} < /tmp/createdbinfo.sql
+
+#    - name: "Simple SELECT query"
+#      postgresql_query:
+#        db: "{{ db_name }}"
+#        login_user: "{{ db_user }}"
+#        login_password: "{{ db_password }}"
+#        query: SELECT version()

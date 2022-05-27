@@ -1,0 +1,36 @@
+<?php
+
+$db_handle = pg_connect("host={{ lb_ip }} dbname={{ db_name }} user={{ db_user }} password={{ db_password }}");
+
+if ($db_handle) 
+{
+
+    $inventory_name =  $_REQUEST['iname'];
+    $quantity = $_REQUEST['quantity'];
+
+    $sql = "INSERT INTO inventory  VALUES ('$inventory_name','$quantity')";
+
+    $result = pg_exec($db_handle, $sql);
+
+    if ($result) 
+    {
+        echo "The query executed successfully.<br>";    
+    } 
+    else 
+    {
+
+        echo "The query failed with the following error:<br>";    
+        echo pg_errormessage($db_handle);    
+    }
+
+    pg_close($db_handle);
+
+} 
+else 
+{
+    echo 'Connection attempt failed.';
+}
+
+
+
+?>

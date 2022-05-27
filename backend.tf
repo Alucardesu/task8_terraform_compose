@@ -21,6 +21,13 @@ resource "azurerm_lb_probe" "backend" {
   resource_group_name = var.resource_group
 }
 
+resource "azurerm_lb_probe" "backend_sql" {
+  loadbalancer_id     = azurerm_lb.backend.id
+  name                = "sql-running-probe"
+  port                = 5432
+  resource_group_name = var.resource_group
+}
+
 resource "azurerm_lb_rule" "backend" {
   loadbalancer_id                = azurerm_lb.backend.id
   name                           = "LBRule"
@@ -31,6 +38,18 @@ resource "azurerm_lb_rule" "backend" {
   resource_group_name            = var.resource_group
   backend_address_pool_ids       = azurerm_lb_backend_address_pool.backend.*.id
   probe_id                       = azurerm_lb_probe.backend.id
+}
+
+resource "azurerm_lb_rule" "backend_sql" {
+  loadbalancer_id                = azurerm_lb.backend.id
+  name                           = "LBRule_SQL"
+  protocol                       = "Tcp"
+  frontend_port                  = 5432
+  backend_port                   = 5432
+  frontend_ip_configuration_name = "localIPAddress"
+  resource_group_name            = var.resource_group
+  backend_address_pool_ids       = azurerm_lb_backend_address_pool.backend.*.id
+  probe_id                       = azurerm_lb_probe.backend_sql.id
 }
 
 resource "azurerm_network_interface" "backend" {

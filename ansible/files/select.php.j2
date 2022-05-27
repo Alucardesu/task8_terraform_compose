@@ -1,0 +1,32 @@
+<?php
+
+$db_handle = pg_connect("host={{ lb_ip }} dbname={{ db_name }} user={{ db_user }} password={{ db_password }}");
+
+if ($db_handle) 
+{
+
+    $sql = "SELECT (item,quantity) FROM inventory";
+    $result = pg_exec($db_handle, $sql);
+
+    for ($row = 0; $row < pg_numrows($result); $row++) 
+    {
+
+        $inventory_name = pg_result($result, $row, 'item');    
+        echo $inventory_name ." ";    
+        $quantity = pg_result($result, $row, 'quantity');    
+        echo $quantity ."<br>";
+        
+    }
+    
+    
+    pg_close($db_handle);
+
+} 
+else 
+{
+
+    echo 'Connection attempt failed.';
+
+}
+
+?>

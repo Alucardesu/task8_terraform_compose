@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 sUser="adminuser"
 sHome="/home/$sUser"
+sRole="$sHome/ansible/roles/task9_web"
+sGit="https://github.com/Alucardesu/task8_terraform_compose/archive/refs/heads/main.tar.gz"
 
 #Set up ssh key
 if [ -e /tmp/id_rsa ]; then
@@ -40,7 +42,8 @@ secret=$3
 tenant=$4
 EOF
             #Downloading Dynamic Inventory Setup
-            su - $sUser -c "wget -q -O ~/ansible/myazure_rm.yml 'https://raw.githubusercontent.com/Alucardesu/task8_terraform_compose/main/ansible/myazure_rm.yml'"
+            su - $sUser -c "mkdir -p $sRole"
+            su - $sUser -c "wget -q -O $sRole/main.tar.gz -c $sGit && tar -zxvf $sRole/main.tar.gz task8_terraform_compose-main/ansible/ --strip-components=2 -C $sRole"
             iWorks=$(echo $?)
             if [ $iWorks -eq 0 ]; then
                 break;

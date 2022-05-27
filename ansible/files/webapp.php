@@ -2,6 +2,10 @@
 <html>
 <body>
 
+<?php
+echo gethostname();
+?>
+
 <form action="/insert.php">
   <label for="iname">Item Name: </label>
   <input type="text" id="iname" name="iname" value="" maxlength="20">

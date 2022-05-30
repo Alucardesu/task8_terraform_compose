@@ -25,15 +25,15 @@ while true; do
         if [ $iWorks -eq 0 ]; then
 
             #Creating ansible directory & config files
-            su - $sUser -c "mkdir -p $sHome/ansible/roles $sHome/.azure" #TODO: Temporal local credentials
-            su - $sUser -c "touch $sHome/.ansible.cfg  $sHome/.azure/credentials" #TODO: Temporal local credentials
+            su - $sUser -c "mkdir -p $sHome/ansible/roles $sHome/.azure" 
+            su - $sUser -c "touch $sHome/.ansible.cfg  $sHome/.azure/credentials" 
             cat <<EOF > $sHome/.ansible.cfg 
 [defaults] 
 inventory = ~/ansible/myazure_rm.yml 
 roles_path = ~/ansible/roles 
 host_key_checking = False
 EOF
-            #TODO: Temporal local credentials
+
             cat <<EOF > $sHome/.azure/credentials 
 [default]
 subscription_id=$1
@@ -43,9 +43,11 @@ tenant=$4
 EOF
             #Downloading Dynamic Inventory Setup
             su - $sUser -c "mkdir -p $sRole"
-            su - $sUser -c "wget -q -O $sRole/main.tar.gz -c $sGit && tar -zxvf $sRole/main.tar.gz task8_terraform_compose-main/ansible/ --strip-components=2 -C $sRole"
+            su - $sUser -c "cd $sRole; wget -q -O $sRole/main.tar.gz -c $sGit && tar -zxvf $sRole/main.tar.gz task8_terraform_compose-main/ansible/ --strip-components=2 -C $sRole;"
             iWorks=$(echo $?)
             if [ $iWorks -eq 0 ]; then
+
+                su - $sUser -c "rm -f $sRole/main.tar.gz; mv $sRole/myazure_rm.yml $sHome/ansible/"
                 break;
             fi
         fi

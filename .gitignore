@@ -3,3 +3,5 @@
 id_rsa
 .terraform.lock*
 id_rsa
+ansible/wordpress/defaults/main.yml
+ansible/postgresql/defaults/main.yml

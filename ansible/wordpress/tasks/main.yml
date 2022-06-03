@@ -1,0 +1,84 @@
+---
+- name: "Sets Nginx conf file"
+  template:
+    src: "nginx.conf.j2"
+    dest: "/etc/nginx/sites-available/{{ http_conf }}"
+
+- name: "Enables new site"
+  file:
+    src: "/etc/nginx/sites-available/{{ http_conf }}"
+    dest: "/etc/nginx/sites-enabled/{{ http_conf }}"
+    state: link
+  notify: Reload Nginx
+
+- name: "Removes 'default' site"
+  file:
+    path: "/etc/nginx/sites-enabled/default"
+    state: absent
+  notify: Reload Nginx
+
+- name: "Download and unpack latest WordPress"
+  unarchive:
+    src: https://wordpress.org/latest.tar.gz
+    dest: "/var/www/html/"
+    remote_src: yes
+    creates: "{{ http_workdir }}"
+  tags: [ wordpress ]
+
+- name: "Find out if PG4WP is installed"
+  ansible.builtin.stat:
+    path: "/srv/pg4wp"
+  register: pg4wp
+  tags: [ wordpress ]  
+
+- name: "Get PG4WP" 
+  ansible.builtin.git:
+    repo: https://github.com/kevinoid/postgresql-for-wordpress.git
+    dest: "/srv/"
+    force: yes
+    clone: yes
+  when: not pg4wp.stat.exists
+  tags: [ wordpress ]  
+
+- name: "Copy PG4WP"
+  copy: 
+    src: "/srv/pg4wp/"
+    dest: "{{ http_workdir }}/wp-content/pg4wp/"
+    remote_src: yes
+  tags: [ wordpress ]
+
+- name: Copy db.php
+  copy:
+    src: "/srv/pg4wp/db.php"
+    dest: "{{ http_workdir }}/wp-content/db.php"
+    remote_src: yes
+  tags: [ wordpress ]  
+
+- name: "Set up wordpress config"
+  template:
+    src: "wp-config.php.j2"
+    dest: "{{ http_workdir }}/wp-config.php"
+
+- name: "Add .htaccess"
+  copy:
+    src: "files/.htaccess"
+    dest: "{{ http_workdir }}/"
+
+- name: Set ownership
+  file:
+    path: "/var/www/html/"
+    state: directory
+    recurse: yes
+    owner: www-data
+    group: www-data
+  tags: [ wordpress ]
+
+- name: Set permissions for directories
+  shell: "/usr/bin/find {{ http_workdir }} -type d -exec chmod 750 {} \\;"
+  tags: [ wordpress ]
+
+- name: Set permissions for files
+  shell: "/usr/bin/find {{ http_workdir }} -type f -exec chmod 640 {} \\;"
+  tags: [ wordpress ]
+
+

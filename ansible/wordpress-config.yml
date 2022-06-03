@@ -1,0 +1,19 @@
+---
+- name: "Install & configure Wordpress"
+  hosts: _web_server
+  become: yes
+  pre_tasks:
+    - name: "Install packages"
+      apt: 
+        name: "{{ item }}"
+        state: present
+        update_cache: true
+      loop:
+        - nginx
+        - php-fpm
+        - php-pgsql
+        - git
+  tasks: 
+    - name: "Configuring from role"
+      import_role:
+        name: wordpress

@@ -1,0 +1,19 @@
+---
+- name: "Install and configure DB Server"
+  hosts: _bd_server
+  become: yes
+  pre_tasks:
+    - name: "Install packages"
+      apt: 
+        name: "{{ item }}"
+        state: present
+        update_cache: true
+      loop:
+        - postgresql
+        - postgresql-contrib
+        - python3-psycopg2
+        - acl
+  tasks: 
+    - name: "Configuring from role"
+      import_role:
+        name: postgresql

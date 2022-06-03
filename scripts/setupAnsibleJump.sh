@@ -43,7 +43,10 @@ tenant=$4
 EOF
             #Downloading Dynamic Inventory Setup
             su - $sUser -c "mkdir -p $sRole"
-            su - $sUser -c "cd $sRole; wget -q -O $sRole/main.tar.gz -c $sGit && tar -zxvf $sRole/main.tar.gz task8_terraform_compose-main/ansible/ --strip-components=2 -C $sRole;"
+            su - $sUser -c "cd $sRole; \
+            wget -q -O $sRole/main.tar.gz -c $sGit && \
+            tar -zxvf $sRole/main.tar.gz task8_terraform_compose-main/ansible/ --strip-components=2 -C $sRole && \
+            ansible-galaxy install sbaerlocher.wp-cli"
             iWorks=$(echo $?)
             if [ $iWorks -eq 0 ]; then
 

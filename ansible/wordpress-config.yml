@@ -14,6 +14,10 @@
         - php-pgsql
         - git
   tasks: 
-    - name: "Configuring from role"
+    - name: "Configuring wp cli"
+      import_role:
+        name: sbaerlocher.wp-cli
+
+    - name: "Configuring wordpress"
       import_role:
         name: wordpress

@@ -17,12 +17,17 @@
     state: absent
   notify: Reload Nginx
 
-- name: "Download and unpack latest WordPress"
-  unarchive:
-    src: https://wordpress.org/latest.tar.gz
-    dest: "/var/www/html/"
-    remote_src: yes
-    creates: "{{ http_workdir }}"
+- name: "Find out if WordPress is installed"
+  ansible.builtin.stat:
+    path: "{{ http_workdir }}"
+  register: wordpress
+  tags: [ wordpress ]  
+
+- name: "Download latest WordPress"
+  command: wp core download --allow-root
+  args:
+    chdir: "{{ http_workdir }}"
+  when: not wordpress.stat.exists
   tags: [ wordpress ]
 
 - name: "Find out if PG4WP is installed"
@@ -58,11 +63,19 @@
   template:
     src: "wp-config.php.j2"
     dest: "{{ http_workdir }}/wp-config.php"
+  tags: [ wordpress ]  
 
 - name: "Add .htaccess"
   copy:
     src: "files/.htaccess"
     dest: "{{ http_workdir }}/"
+  tags: [ wordpress ]  
+
+- name: "Initialize WordPress"
+  command: wp core install --title="{{ wp_proyect }}" --url="{{ wp_URL }}" --admin_user="{{ wp_admin_user }}" --admin_email="{{ wp_admin_email }}" --admin_password={{ wp_admin_password }} --allow-root
+  args:
+    chdir: "{{ http_workdir }}"
+  tags: [ wordpress ]
 
 - name: Set ownership
   file:

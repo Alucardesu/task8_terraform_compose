@@ -1,22 +1,4 @@
 ---
-- name: "Sets Nginx conf file"
-  template:
-    src: "nginx.conf.j2"
-    dest: "/etc/nginx/sites-available/{{ http_conf }}"
-
-- name: "Enables new site"
-  file:
-    src: "/etc/nginx/sites-available/{{ http_conf }}"
-    dest: "/etc/nginx/sites-enabled/{{ http_conf }}"
-    state: link
-  notify: Reload Nginx
-
-- name: "Removes 'default' site"
-  file:
-    path: "/etc/nginx/sites-enabled/default"
-    state: absent
-  notify: Reload Nginx
-
 - name: "Find out if WordPress is installed"
   ansible.builtin.stat:
     path: "{{ http_workdir }}"
@@ -24,9 +6,7 @@
   tags: [ wordpress ]  
 
 - name: "Download latest WordPress"
-  command: wp core download --allow-root
-  args:
-    chdir: "{{ http_workdir }}"
+  command: "wp core download --path={{ http_workdir }} --allow-root"  
   when: not wordpress.stat.exists
   tags: [ wordpress ]
 
@@ -67,7 +47,7 @@
 
 - name: "Add .htaccess"
   copy:
-    src: "files/.htaccess"
+    src: ".htaccess"
     dest: "{{ http_workdir }}/"
   tags: [ wordpress ]  
 

@@ -5,3 +5,4 @@ id_rsa
 id_rsa
 ansible/wordpress/defaults/main.yml
 ansible/postgresql/defaults/main.yml
+ansible/nginx/defaults/main.yml

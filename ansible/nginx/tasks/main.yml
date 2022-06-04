@@ -1,0 +1,58 @@
+---
+- name: "Generate an OpenSSL private key"
+  openssl_privatekey:
+    path: "/etc/ssl/private/{{ key_common_name }}.pem"
+
+- name: "Create ssl directory"
+  file:
+    path: /etc/ssl/csr
+    state: directory
+    mode: 0755
+
+- name: "Generate an OpenSSL Certificate Signing Request"
+  openssl_csr:
+    path: "/etc/ssl/csr/{{ key_common_name }}.csr"
+    privatekey_path: "/etc/ssl/private/{{ key_common_name }}.pem"
+    country_name: "{{ key_country_name }}"
+    organization_name: "{{ key_organization_name }}"
+    email_address: "{{ key_email_address }}"
+    common_name: "{{ key_common_name }}" 
+
+- name: Generate a self signed certificate
+  openssl_certificate:
+    path: /etc/ssl/certs/nginx-selfsigned.crt
+    privatekey_path: /etc/ssl/private/{{ key_common_name }}.pem
+    csr_path: /etc/ssl/csr/{{ key_common_name }}.csr
+    provider: selfsigned
+
+- name: "Sets Nginx conf file"
+  template:
+    src: "nginx.conf.j2"
+    dest: "/etc/nginx/sites-available/{{ http_conf }}"
+
+- name: "Enables new site"
+  file:
+    src: "/etc/nginx/sites-available/{{ http_conf }}"
+    dest: "/etc/nginx/sites-enabled/{{ http_conf }}"
+    state: link
+  notify: Reload Nginx
+
+- name: "Removes 'default' site"
+  file:
+    path: "/etc/nginx/sites-enabled/default"
+    state: absent
+  notify: Reload Nginx
+
+- name: "SSL Params file"
+  copy:
+    src: "ssl-params.conf"
+    dest: "/etc/nginx/snippets/ssl-params.conf"
+  notify: Reload Nginx
+
+- name: "Set self-signed.conf"
+  template:
+    src: "self-signed.conf.j2"
+    dest: "/etc/nginx/snippets/self-signed.conf"
+  notify: Reload Nginx
+
+

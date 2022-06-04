@@ -13,7 +13,13 @@
         - php-fpm
         - php-pgsql
         - git
+        - openssl
+        - python-openssl
   tasks: 
+    - name: "Set up nginx HTTPS"
+      import_role:
+        name: nginx
+
     - name: "Configuring wp cli"
       import_role:
         name: sbaerlocher.wp-cli
